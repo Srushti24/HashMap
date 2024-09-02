@@ -2,12 +2,17 @@
 #define HASHMAP_H
 
 #include <iostream>
-using namespace std;
 #include <list>
 
 
 template<typename K, typename V>
 class HashMap{
+    struct HashNode
+    {
+        K key;
+        V value;
+        HashNode* next;
+    };
 
     public:
     HashMap(K key, V value);
@@ -15,21 +20,13 @@ class HashMap{
     void insert(K key, V value);
     bool contains(K key);
     void remove(K key);
+    std::list<HashNode*>::iterator find(K key);
     HashMap(const HashMap& hashmap);
     HashMap& operator=(const HashMap& hashmap);
 
     private:
-    K key;
-    V value;
     int MAX_SIZE = 10;
-    
-    struct HashNode
-    {
-        K key;
-        V value;
-        HashNode* next;
-    };
-    list<HashNode> hashList;
+    std::list<HashNode*> bucket;
     int getHash(K key);
 };
 
