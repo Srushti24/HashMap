@@ -3,4 +3,4 @@ cd build
 cmake ..
 make
 cd src
-./HashMap
+./hashmap_generic_test

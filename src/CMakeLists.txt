@@ -1,7 +1,7 @@
-ADD_EXECUTABLE(HashMap main.cpp)
+add_executable(hashmap_generic_test 
+hashmap_generic_test.cpp)
 
-ADD_LIBRARY(Map
-hashmap.cpp
-)
-
-target_link_libraries(HashMap PUBLIC Map)
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    add_compile_options(-fsanitize=address -g)
+    add_link_options(-fsanitize=address)
+endif()
