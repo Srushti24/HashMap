@@ -1,0 +1,37 @@
+# Use this file to configure clang-format
+
+# Indentation settings
+IndentWidth: 4
+UseTab: Never
+
+# Aligning settings
+AlignConsecutiveDeclarations: true
+AlignConsecutiveAssignments: true
+
+# Spaces and line breaks
+SpaceBeforeParens: ControlStatements
+SpaceAfterCStyleCast: true
+SpaceAfterTemplateKeyword: true
+SpacesInParentheses: false
+SpacesInAngles: false
+SpacesBeforeTrailingComments: 1
+BreakBeforeBraces: Attach
+
+# Column limit
+ColumnLimit: 120
+
+# Comment settings
+CommentPragmas: Keep
+BinPackParameters: true
+
+# Include settings
+SortIncludes: true
+IncludeBlocks: Preserve
+
+# Naming conventions
+PointerAlignment: Left
+
+# Allow multiple empty lines (adjust as needed)
+MaxEmptyLinesToKeep: 1
+
+# Additional custom rules can go here
