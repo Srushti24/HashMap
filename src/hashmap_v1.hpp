@@ -90,6 +90,7 @@ template <typename K, typename V> class HashMapV1 {
         hashmapv1.array       = nullptr;
         hashmapv1.currentSize = 0;
         hashmapv1.arraySize   = 10;
+        return *this;
     }
 
     bool find(K key, V& value) {
