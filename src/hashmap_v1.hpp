@@ -7,7 +7,7 @@ template <typename K, typename V> class HashMapV1 {
     HashMapV1() {}
 
     void destroy() {
-        if (currentSize != 0) {
+        if (numberOfElements != 0) {
             for (size_t i = 0; i < arraySize; i++) {
                 LinkedList* temp = array[i].next;
                 while (temp != nullptr) {
@@ -43,7 +43,7 @@ template <typename K, typename V> class HashMapV1 {
     }
 
     // Copy constructor
-    HashMapV1(const HashMapV1& hashmapv1) : arraySize(hashmapv1.arraySize), currentSize(hashmapv1.currentSize) {
+    HashMapV1(const HashMapV1& hashmapv1) : arraySize(hashmapv1.arraySize), numberOfElements(hashmapv1.numberOfElements) {
         construct();
         for (size_t i = 0; i < arraySize; i++) {
             LinkedList* temp         = hashmapv1.array[i].next;
@@ -60,7 +60,7 @@ template <typename K, typename V> class HashMapV1 {
     HashMapV1 operator=(const HashMapV1& hashmapv1) {
         destroy();
         arraySize   = hashmapv1.arraySize;
-        currentSize = hashmapv1.currentSize;
+        numberOfElements = hashmapv1.numberOfElements;
         construct();
         for (size_t i = 0; i < arraySize; i++) {
             LinkedList* temp         = hashmapv1.array[i].next;
@@ -75,20 +75,20 @@ template <typename K, typename V> class HashMapV1 {
     }
 
     // Move constructor
-    HashMapV1(HashMapV1&& hashmapv1) : arraySize(hashmapv1.arraySize), currentSize(hashmapv1.currentSize) {
+    HashMapV1(HashMapV1&& hashmapv1) : arraySize(hashmapv1.arraySize), numberOfElements(hashmapv1.numberOfElements) {
         array                 = hashmapv1.array;
         hashmapv1.array       = nullptr;
-        hashmapv1.currentSize = 0;
+        hashmapv1.numberOfElements = 0;
         hashmapv1.arraySize   = 10;
     }
 
     // Move Assignment operator
     HashMapV1 operator=(HashMapV1&& hashmapv1) {
         arraySize             = hashmapv1.arraySize;
-        currentSize           = hashmapv1.currentSize;
+        numberOfElements           = hashmapv1.numberOfElements;
         array                 = hashmapv1.array;
         hashmapv1.array       = nullptr;
-        hashmapv1.currentSize = 0;
+        hashmapv1.numberOfElements = 0;
         hashmapv1.arraySize   = 10;
         return *this;
     }
@@ -107,30 +107,60 @@ template <typename K, typename V> class HashMapV1 {
         return false;
     }
 
-    void insert(K key, V value) {
+    bool remove(K key) {
+        if (array != nullptr) {
+            size_t      randomNumber = hash(key);
+            size_t      index        = randomNumber % arraySize;
+            LinkedList* list         = array[index].next;
+            LinkedList* prev         = &array[index];
+            while (list != nullptr) {
+                if (*(list->key) == key) {
+                    prev->next = list->next;
+                    delete list->key;
+                    delete list->value;
+                    numberOfElements--;
+                    return true;
+                }
+                list = list->next;
+                prev = prev->next;
+            }
+        }
+        return false;
+    }
+
+    void insert(const K& key, const V& value) {
         if (array == nullptr) {
             construct();
         }
         size_t      randomNumber = hash(key);
         size_t      index        = randomNumber % arraySize;
-        LinkedList* temp         = new LinkedList(key, value);
-        temp->next               = array[index].next;
-        array[index].next        = temp;
-        currentSize++;
+        LinkedList* current      = array[index].next;
+        while (current != nullptr) {
+            if (*(current->key) == key) {
+                delete current->value;
+                current->value = new V(value);
+                return;
+            }
+            current = current->next;
+        }
+        LinkedList* temp  = new LinkedList(key, value);
+        temp->next        = array[index].next;
+        array[index].next = temp;
+        numberOfElements++;
     }
 
-    size_t size() { return currentSize; }
+    size_t size() { return numberOfElements; }
 
   private:
     int arraySize   = 10;
-    int currentSize = 0;
+    int numberOfElements = 0;
     struct LinkedList {
         K*          key;
         V*          value;
         LinkedList* next;
 
         LinkedList() : next(nullptr) {}
-        LinkedList(K m_key, V v_value) {
+        LinkedList(const K& m_key, const V& v_value) {
             key   = new K(m_key);
             value = new V(v_value);
             next  = nullptr;
