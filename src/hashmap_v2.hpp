@@ -99,7 +99,7 @@ template <typename K, typename V> class HashMapV2 {
         const unsigned char* data = reinterpret_cast<const unsigned char*>(&key);
         size_t               size = sizeof(K);
 
-        size_t hash = 14695981039346656037ULL; 
+        size_t hash = 14695981039346656037ULL;
         for (size_t i = 0; i < size; ++i) {
             hash ^= static_cast<size_t>(data[i]);
             hash *= 1099511628211ULL;
@@ -112,11 +112,11 @@ template <typename K, typename V> class HashMapV2 {
         if (array == nullptr) {
             contruct();
         }
-        int randomNumber = hash(k);
-        int index        = randomNumber % arraySize;
-        LinkedList* newNode = new LinkedList(k, v);
-        newNode->next       = array[index].next;
-        array[index].next   = newNode;
+        int         randomNumber = hash(k);
+        int         index        = randomNumber % arraySize;
+        LinkedList* newNode      = new LinkedList(k, v);
+        newNode->next            = array[index].next;
+        array[index].next        = newNode;
         currentSize++;
     }
 
