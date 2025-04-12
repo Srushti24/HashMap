@@ -8,91 +8,81 @@ template <typename K, typename V> class HashMapV2 {
 
     // Copy constructor
     HashMapV2(const HashMapV2& hashmapv2) {
-        currentSize = hashmapv2.currentSize;
-        arraySize   = hashmapv2.arraySize;
-        if (hashmapv2.array != nullptr) {
-            array = new LinkedList[arraySize];
-            for (size_t i = 0; i < arraySize; i++) {
-                LinkedList* curr = hashmapv2.array[i].next;
-                LinkedList* temp = nullptr;
-                while (curr != nullptr) {
-                    LinkedList* temp1 = new LinkedList(curr->key_, curr->value_);
-                    if (temp == nullptr) {
-                        temp = temp1;
-                    } else {
-                        temp->next = temp1;
-                        temp       = temp->next;
-                    }
-                    curr = curr->next;
+        elements_size_ = hashmapv2.elements_size_;
+        array_size_    = hashmapv2.array_size_;
+        if (hashmapv2.array_ != nullptr) {
+            array_ = new LinkedList[array_size_];
+            for (size_t i = 0; i < array_size_; i++) {
+                LinkedList* hashmapv2_current_node = hashmapv2.array_[i].next_;
+                LinkedList* current_node           = &array_[i];
+                while (hashmapv2_current_node != nullptr) {
+                    LinkedList* new_node = new LinkedList(hashmapv2_current_node->key_, hashmapv2_current_node->value_);
+                    current_node->next_  = new_node;
+                    current_node         = current_node->next_;
+                    hashmapv2_current_node = hashmapv2_current_node->next_;
                 }
-                array[i].next = temp;
             }
         }
     }
 
     // Copy Assignment operator
-    HashMapV2 operator=(const HashMapV2& hashmapv2) {
+    HashMapV2& operator=(const HashMapV2& hashmapv2) {
         destroy();
-        arraySize   = hashmapv2.arraySize;
-        currentSize = hashmapv2.currentSize;
-        if (hashmapv2.array != nullptr) {
-            array = new LinkedList[arraySize];
-            for (size_t i = 0; i < arraySize; i++) {
-                LinkedList* curr = hashmapv2.array[i].next;
-                LinkedList* temp = nullptr;
-                while (curr != nullptr) {
-                    LinkedList* temp1 = new LinkedList(curr->key_, curr->value_);
-                    if (temp == nullptr) {
-                        temp = temp1;
-                    } else {
-                        temp->next = temp1;
-                        temp       = temp->next;
-                    }
-                    curr = curr->next;
+        array_size_    = hashmapv2.array_size_;
+        elements_size_ = hashmapv2.elements_size_;
+        if (hashmapv2.array_ != nullptr) {
+            array_ = new LinkedList[array_size_];
+            for (size_t i = 0; i < array_size_; i++) {
+                LinkedList* hashmapv2_current_node = hashmapv2.array_[i].next_;
+                LinkedList* current_node           = &array_[i];
+                while (hashmapv2_current_node != nullptr) {
+                    LinkedList* new_node = new LinkedList(hashmapv2_current_node->key_, hashmapv2_current_node->value_);
+                    current_node->next_  = new_node;
+                    current_node         = current_node->next_;
+                    hashmapv2_current_node = hashmapv2_current_node->next_;
                 }
-                array[i].next = temp;
             }
         }
         return *this;
     }
 
     // Move Constructor
-    HashMapV2(HashMapV2&& hashmapv2) : arraySize(hashmapv2.arraySize), currentSize(hashmapv2.currentSize) {
-        array                 = hashmapv2.array;
-        hashmapv2.arraySize   = 10;
-        hashmapv2.currentSize = 0;
-        hashmapv2.array       = nullptr;
+    HashMapV2(HashMapV2&& hashmapv2) : array_size_(hashmapv2.array_size_), elements_size_(hashmapv2.elements_size_) {
+        array_                   = hashmapv2.array_;
+        hashmapv2.array_size_    = 10;
+        hashmapv2.elements_size_ = 0;
+        hashmapv2.array_         = nullptr;
     }
 
     // Move Assignment operator
-    HashMapV2 operator=(HashMapV2&& hashmapv2) {
+    HashMapV2& operator=(HashMapV2&& hashmapv2) {
         destroy();
-        arraySize             = hashmapv2.arraySize;
-        currentSize           = hashmapv2.currentSize;
-        array                 = hashmapv2.array;
-        hashmapv2.arraySize   = 10;
-        hashmapv2.currentSize = 0;
-        hashmapv2.array       = nullptr;
+        array_size_              = hashmapv2.array_size_;
+        elements_size_           = hashmapv2.elements_size_;
+        array_                   = hashmapv2.array_;
+        hashmapv2.array_size_    = 10;
+        hashmapv2.elements_size_ = 0;
+        hashmapv2.array_         = nullptr;
         return *this;
     }
 
     void destroy() {
-        if (array != nullptr) {
-            for (int i = 0; i < arraySize; i++) {
-                LinkedList* linkedList = array[i].next;
-                while (linkedList != nullptr) {
-                    LinkedList* nextLinkedList = linkedList->next;
-                    delete linkedList;
-                    linkedList = nextLinkedList;
+        if (array_ != nullptr) {
+            for (int i = 0; i < array_size_; i++) {
+                LinkedList* current_node = array_[i].next_;
+                while (current_node != nullptr) {
+                    LinkedList* next_node = current_node->next_;
+                    delete current_node;
+                    current_node = next_node;
                 }
             }
-            delete[] array;
+            delete[] array_;
         }
     }
 
     ~HashMapV2() { destroy(); }
 
-    void contruct() { array = new LinkedList[arraySize]; }
+    void construct() { array_ = new LinkedList[array_size_]; }
 
     // Random hash
     size_t hash(const K& key) {
@@ -108,66 +98,80 @@ template <typename K, typename V> class HashMapV2 {
         return hash;
     }
 
-    void insert(K k, V v) {
-        if (array == nullptr) {
-            contruct();
+    void insert(const K& key, const V& value) {
+        if (array_ == nullptr) {
+            construct();
         }
-        int         randomNumber = hash(k);
-        int         index        = randomNumber % arraySize;
-        LinkedList* newNode      = new LinkedList(k, v);
-        newNode->next            = array[index].next;
-        array[index].next        = newNode;
-        currentSize++;
+        size_t      random_number = hash(key);
+        size_t      index         = random_number % array_size_;
+        LinkedList* current_node  = array_[index].next_;
+        while (current_node != nullptr) {
+            if (current_node->key_ == key) {
+                current_node->value_ = value;
+                return;
+            }
+            current_node = current_node->next_;
+        }
+        LinkedList* new_node = new LinkedList(key, value);
+        new_node->next_      = array_[index].next_;
+        array_[index].next_  = new_node;
+        elements_size_++;
     }
 
-    bool find(K k, V& v) {
-        int         randomNumber = hash(k);
-        int         index        = randomNumber % arraySize;
-        LinkedList* temp         = &array[index];
-        while (temp != nullptr) {
-            if (temp->key_ == k) {
-                v = temp->value_;
+    bool find(const K& key, V& value) {
+        if (array_ == nullptr) {
+            return false;
+        }
+        size_t      random_number = hash(key);
+        size_t      index         = random_number % array_size_;
+        LinkedList* current_node  = array_[index].next_;
+        while (current_node != nullptr) {
+            if (current_node->key_ == key) {
+                value = current_node->value_;
                 return true;
             }
-            temp = temp->next;
+            current_node = current_node->next_;
         }
         return false;
     }
 
-    bool remove(K k) {
-        int         randomNumber = hash(k);
-        int         index        = randomNumber % arraySize;
-        LinkedList* temp         = array[index].next;
-        LinkedList* previous     = &array[index];
-        while (temp != nullptr) {
-            if (temp->key_ == k) {
-                previous->next = temp->next;
-                delete temp;
-                currentSize--;
+    bool remove(const K& key) {
+        if (array_ == nullptr) {
+            return false;
+        }
+        size_t      random_number = hash(key);
+        size_t      index         = random_number % array_size_;
+        LinkedList* current_node  = array_[index].next_;
+        LinkedList* previous_node = &array_[index];
+        while (current_node != nullptr) {
+            if (current_node->key_ == key) {
+                previous_node->next_ = current_node->next_;
+                delete current_node;
+                elements_size_--;
                 return true;
             }
-            previous = temp;
-            temp     = temp->next;
+            previous_node = current_node;
+            current_node  = current_node->next_;
         }
         return false;
     }
 
-    int size() { return currentSize; }
+    int size() { return elements_size_; }
 
   private:
-    int arraySize   = 10;
-    int currentSize = 0;
+    int array_size_    = 10;
+    int elements_size_ = 0;
     struct LinkedList {
         K           key_;
         V           value_;
-        LinkedList* next;
-        LinkedList() { next = nullptr; }
-        LinkedList(K& key, V& value) {
+        LinkedList* next_;
+        LinkedList() { next_ = nullptr; }
+        LinkedList(const K& key, const V& value) {
             key_   = key;
             value_ = value;
-            next   = nullptr;
+            next_  = nullptr;
         }
         ~LinkedList() {}
     };
-    LinkedList* array = nullptr;
+    LinkedList* array_ = nullptr;
 };

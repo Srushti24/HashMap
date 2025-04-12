@@ -101,6 +101,7 @@ void testHashMapWithStruct() {
         S& operator=(const S& copy) {
             m_constructor = copy.m_constructor;
             m_destructor  = copy.m_destructor;
+            m_constructor++;
             return *this;
         }
 
@@ -108,7 +109,7 @@ void testHashMapWithStruct() {
             return m_constructor == other.m_constructor && m_destructor == other.m_destructor;
         }
 
-        S(const S& copy) : m_constructor(copy.m_constructor), m_destructor(copy.m_destructor) {}
+        S(const S& copy) : m_constructor(copy.m_constructor), m_destructor(copy.m_destructor) { m_constructor++; }
 
         ~S() { m_destructor++; }
 
@@ -116,46 +117,50 @@ void testHashMapWithStruct() {
         int& m_destructor;
     };
     {
-        HashMapV1<S, S> hashmap;
-        S               s1(constructor, destructor);
-        S               s2(constructor, destructor);
-        S               s3(constructor, destructor);
-        S               s4(constructor, destructor);
-        S               s5(constructor, destructor);
-        S               s6(constructor, destructor);
-        S               s7(constructor, destructor);
-        S               s8(constructor, destructor);
         {
-            HashMapV1<S, S> hashmap1;
+            HashMapV1<S, int> hashmap1;
+            S                 s1(constructor, destructor);
+            S                 s2(constructor, destructor);
+            hashmap1.insert(s1, 1);
+            hashmap1.insert(s2, 2);
+            HashMapV1<S, int> hashmap2;
+            assert(constructor == 3);
+            assert(destructor == 0);
             {
-                hashmap1.insert(s1, s2);
-                hashmap1.insert(s2, s2);
-                HashMapV1<S, S> hashmap2;
-                assert(constructor == 2);
+                HashMapV1<S, int> hashmap2;
+                S                 s3(constructor, destructor);
+                S                 s4(constructor, destructor);
+                hashmap2.insert(s3, 3);
+                hashmap2.insert(s4, 4);
+                assert(constructor == 6);
+                assert(destructor == 0);
                 {
-                    hashmap2.insert(s3, s2);
-                    hashmap2.insert(s4, s2);
-                    assert(constructor == 4);
-                    HashMapV1<S, S> hashmap3;
+                    HashMapV1<S, int> hashmap3;
+                    S                 s5(constructor, destructor);
+                    S                 s6(constructor, destructor);
+                    hashmap3.insert(s5, 5);
+                    hashmap3.insert(s6, 6);
+                    assert(constructor == 9);
+                    assert(destructor == 0);
                     {
-                        hashmap3.insert(s5, s2);
-                        hashmap3.insert(s6, s2);
-                        assert(constructor == 6);
-                        HashMapV1<S, S> hashmap4;
-                        {
-                            hashmap4.insert(s7, s2);
-                            hashmap4.insert(s8, s2);
-                        }
-                        assert(constructor == 8);
-                        assert(destructor == 2);
+                        S                 s7(constructor, destructor);
+                        S                 s8(constructor, destructor);
+                        HashMapV1<S, int> hashmap4;
+                        hashmap4.insert(s7, 7);
+                        hashmap4.insert(s8, 8);
+                        assert(constructor == 12);
                     }
-                    assert(destructor == 4);
+                    assert(constructor == 12);
+                    assert(destructor == 3);
                 }
+                assert(constructor == 12);
                 assert(destructor == 6);
             }
-            assert(destructor == 8);
+            assert(constructor == 12);
+            assert(destructor == 9);
         }
-        assert(destructor == 8);
+        assert(constructor == 12);
+        assert(destructor == 12);
     }
 }
 
@@ -206,7 +211,7 @@ void testDuplicateInsertion() {
 
 int main() {
     testHashMapInt();
-    // testHashMapWithStruct();
+    testHashMapWithStruct();
     stressTestRemoval();
     testDuplicateInsertion();
     return 0;
