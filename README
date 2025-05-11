@@ -1,0 +1,10 @@
+HashMap version one:
+HashMap version one assumes: 
+K will always be a primitive type [ As we use std::hash to calculate hash]
+K and V will always have a default constructor
+
+
+HashMap version two:
+K and V might not have default constructor
+Hash Function which works for all
+
