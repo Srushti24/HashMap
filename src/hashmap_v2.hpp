@@ -95,7 +95,6 @@ public:
   }
 
   void resize() {
-    std::cout << "resize called" << std::endl;
     size_t new_size = array_size_ * 10;
     LinkedList* new_array = new LinkedList[new_size];
     for (size_t i = 0; i < array_size_; i++) {

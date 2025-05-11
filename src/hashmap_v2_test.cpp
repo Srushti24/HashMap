@@ -113,8 +113,29 @@ void stressTestRemoval() {
   assert(value == 6);
 }
 
+void hashTest() {
+  HashMapV2<int, int> hashmap;
+  hashmap.insert(2, 3);
+  hashmap.insert(4, 2);
+  hashmap.insert(6, 5);
+  assert(hashmap.size() == 3);
+  int value;
+  bool find = hashmap.find(6, value);
+  assert(find == true);
+  assert(value == 5);
+  hashmap.insert(6, 1);
+  hashmap.insert(6, 2);
+  hashmap.insert(6, 3);
+  hashmap.insert(6, 4);
+  find = hashmap.find(6, value);
+  assert(find == true);
+  assert(value == 4);
+  assert(hashmap.size() == 3);
+}
+
 int main() {
   testHashMapInt();
   stressTestRemoval();
+  hashTest();
   return 0;
 }
